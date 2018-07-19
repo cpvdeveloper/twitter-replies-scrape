@@ -13,19 +13,27 @@ api = twitter.Api(consumer_key='your_consumer_key',
 
 all_comments = []
 
-def find_tweet_ids(name):
+def find_tweet_ids(name, iterations):
     """
     :param name: twitter username, string
+    :param iterations: integer
+    :return: a set of unique tweet ids
     """
-    statuses = api.GetUserTimeline(screen_name=name, exclude_replies=True, count=20)
     tweet_ids = []
-    for idx, val in enumerate(statuses):
-        tweet_ids.append(str(statuses[idx].id))
-    return tweet_ids
+    max_id = ''
+    for i in range(iterations):
+        statuses = api.GetUserTimeline(screen_name=name, exclude_replies=True, count=200, max_id=max_id)
+        for idx, val in enumerate(statuses):
+            tweet_ids.append(str(statuses[idx].id))
+        max_id = min(tweet_ids)
+    return set(tweet_ids)
 
-def find_comments(tweet_id):
+def find_comments(tweet_id, name):
     """
-    :param tweet_id: string
+    Finds all the comments left on the specified tweets
+    :param tweet_id: integer
+    :param name: string
+    :return: array of all comments
     """
     content = requests.get("https://twitter.com/" + name + "/status/" + str(tweet_id)).content
     html_soup = bs(content, "html.parser")
@@ -35,19 +43,25 @@ def find_comments(tweet_id):
     return all_comments
 
 def create_dataframe(data):
+    """
+    Converts an array of into dataframe
+    :param data:
+    :return: dataframe
+    """
     df = pd.DataFrame(data)
     return df
 
-def main(name):
+def main(name, iterations):
     try:
         api.VerifyCredentials()
     except Exception as err:
         print(err.message)
 
-    find_tweet_ids(name)
+    tweet_ids = find_tweet_ids(name, iterations)
+    print(tweet_ids)
     for id in tweet_ids:
         find_comments(id, name)
-    create_dataframe(all_comments)
+    df = create_dataframe(all_comments)
     print(df)
 
 main('districtline')
