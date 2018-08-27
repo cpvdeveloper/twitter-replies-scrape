@@ -1,0 +1,6 @@
+twitter
+requests
+bs4
+pandas
+matplotlib
+wordcloud
