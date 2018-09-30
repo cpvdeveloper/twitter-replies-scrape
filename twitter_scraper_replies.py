@@ -27,7 +27,7 @@ def find_tweet_ids(name, iterations):
     # store the ids of tweets that will later by scraped for replies
     tweet_ids = []
 
-    # 
+    # each iteration finds about 80 tweet ids
     max_id = ''
     for i in range(iterations):
         statuses = api.GetUserTimeline(screen_name='districtline', exclude_replies=True, count=200, max_id=max_id)
@@ -94,9 +94,7 @@ def show_wordcloud(fnc_stopwords, dataframe, title = None):
     plt.show()
 
 def main():
-
     name, iterations = input("Enter a target twitter handle and number of iterations, separated by a space: \n").split(' ')
-
     tweet_ids = find_tweet_ids(name, int(iterations))
     print("Found {} tweet ids".format(len(tweet_ids)))
 
