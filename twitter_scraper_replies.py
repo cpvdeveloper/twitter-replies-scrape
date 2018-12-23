@@ -27,13 +27,14 @@ def find_tweet_ids(name, iterations):
     # store the ids of tweets that will later by scraped for replies
     tweet_ids = []
 
-    # each iteration finds about 80 tweet ids
+    # each iteration usually finds about 80 tweet ids
     max_id = ''
-    for i in range(iterations):
-        statuses = api.GetUserTimeline(screen_name='districtline', exclude_replies=True, count=200, max_id=max_id)
-        for idx in range(len(statuses)):
-            tweet_ids.append(str(statuses[idx].id))
-        max_id = min(tweet_ids)
+    for _ in range(iterations):
+        statuses = api.GetUserTimeline(screen_name=name, exclude_replies=True, count=200, max_id=max_id)
+        for status in statuses:
+            tweet_ids.append(str(status.id))
+
+        max_id = min(tweet_ids) # set the max_id to be used on the next iteration
     return set(tweet_ids)
 
 def find_replies(tweet_id, name):
@@ -65,10 +66,7 @@ def generate_stopwords():
     stopwords = set(STOPWORDS)
 
     # custom stopwords that we don't want
-    stopwords_custom = ["aria", "img", "Emoji", "atreply", "twitter", "Hi", "train", "district", "service"]
-
-    # TODO - station names are to be expected but aren't very interesting
-    station_names = []
+    stopwords_custom = []
 
     for word in stopwords_custom:
         stopwords.add(word)
